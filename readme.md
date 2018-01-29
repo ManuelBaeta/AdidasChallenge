@@ -34,13 +34,13 @@ It is a Eureka client.
 
 ## Libraries used by all projects
 
-###org.springframework.boot:spring-boot-starter-parent (1.5.9.RELEASE)
+### org.springframework.boot:spring-boot-starter-parent (1.5.9.RELEASE)
 * Inheriting from this POM parent, It is the best way to depend on spring boot projects and third party libraries in a proper way, using internally a Spring Boot BOM: It defines for each dependency the approved version, ie: all external (Jackson, guava, etc...) and internal dependencies (within Spring framework) are guaranteed to work well together.
 
-###org.springframework.boot:spring-boot-starter-web
+### org.springframework.boot:spring-boot-starter-web
 * Add base web application infrastructure: embedded Tomcat and Spring MVC (Model View Controller) framework. Besides it is a pre-requisite for other dependencies used as actuator.
 
-###org.springframework.boot:spring-boot-starter-actuator
+### org.springframework.boot:spring-boot-starter-actuator
 * Enable actuator endpoints, a set of production-ready endpoints that allows application monitoring such /health, /info, /metrics. 
 * On the application.yml can be tweaked those endpoints, ie: if they are enabled, id they are sensitive (providing less information to unauthenticated requests)..
 
@@ -53,48 +53,48 @@ It is a Eureka client.
 
 ## Libraries used by Zuul
 
-###org.springframework.cloud:spring-cloud-starter-zuul (1.3.5.RELEASE)
+### org.springframework.cloud:spring-cloud-starter-zuul (1.3.5.RELEASE)
 * It converts spring boot application Zuul into a real Zuul edge-router. 
 * It is required to add specific configuration on application.yml: to match request patterns with services, ribbon and hyxtrix configuration ,etc . 
 * See Zuul readme (/AdidasChallenge/Zuul/readme.md) for more details.
 
-###org.springframework.cloud:spring-cloud-starter-eureka (1.3.5.RELEASE)
+### org.springframework.cloud:spring-cloud-starter-eureka (1.3.5.RELEASE)
 * It enables this application to act as an Eureka Client. It is required specific configuration on application.yml to be able to reach EurekaServer.
 
 ## Libraries used by Routes.Store.Service
 
-###spring-boot-starter-data-jpa
+### spring-boot-starter-data-jpa
 * It is used to provide a jpa based repository. This library is very handy as its CrudRepository does all of the heavy lifting leaving me just to add a method for a specific query (check if a route is present before inserting). 
 * Persistance Provider (ORM) by default is Hibernate.
 
-###com.h2database.h2
+### com.h2database.h2
 * It is a Java in-memory Database, if spring boot detects it in the classpath it is auto configured (no connection string, user, password, etc..  required).
 
-###org.springframework.cloud:spring-cloud-starter-eureka (exclude javax.ws.rs: jsr311-api)
+### org.springframework.cloud:spring-cloud-starter-eureka (exclude javax.ws.rs: jsr311-api)
 * It enables this application to act as an Eureka Client. 
 * It is required specific configuration on application.yml to be able to reach EurekaServer.
 * A exclusion is required because eureka uses jax-rs 1.x and on the project it is also used JAX-RS 2.x to implement REST handling.
 
-###org.springframework.boot:spring-boot-starter-jersey
+### org.springframework.boot:spring-boot-starter-jersey
 * It is the JAX-RS 2.X Jersey implementation, used to implement REST features. Use of JAX-RS 2.X over Spring MVC is a matter of taste, I feel more comfortable using jersey.
 
-###org.springframework.boot:spring-boot-starter-test
+### org.springframework.boot:spring-boot-starter-test
 * It includes several dependencies such JUnit, Hamcrest and Mockito to perform unit testing.
 
 ## Libraries used by Routes.Optimizer.Service
 
-###org.springframework.cloud:spring-cloud-starter-eureka (exclude javax.ws.rs: jsr311-api)
+### org.springframework.cloud:spring-cloud-starter-eureka (exclude javax.ws.rs: jsr311-api)
 * It enables application to act as a Eureka Cllient. It is required specific configuration on application.yml to be able to reach EurekaServer.
 A exclusion is required because Eureka uses jax-rs 1.x and I use jax-rs 2.x  to define REST resource classes.
 
-###org.springframework.boot:spring-boot-starter-jersey 
+### org.springframework.boot:spring-boot-starter-jersey 
 
-###org.springframework.boot:spring-boot-starter-test
+### org.springframework.boot:spring-boot-starter-test
 
-###joda-time:joda-time 
+### joda-time:joda-time 
 * It is a  powerful data and time handling library. It is used on the project to calculate the period of time between arrival and departure times; this period is converted into minutes that are used as cost on a directed graph.
 
-###es.usc.citius.hipster:hipster-all
+### es.usc.citius.hipster:hipster-all
 It is a library for heuristic search, in the context of the project it is used to solve Dijkstra algorithm. 
 For the project, it is required to optimize by time and by hops:
 * By time: It makes a weighted directed graph, using minutes as weight, this way Dijkstra solves  the shortest path (in time).
