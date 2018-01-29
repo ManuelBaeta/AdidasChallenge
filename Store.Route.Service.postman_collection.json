@@ -1,0 +1,100 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Store.Route.Service",
+		"_postman_id": "81d9044a-3504-8940-1b70-efc974b11133",
+		"description": "Testing API to perform crud operations on Routes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add route",
+			"request": {
+				"url": "http://192.168.99.100:9100/routes-store-service/api/route",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"city\" : \"ZAR\",\n\t\"destination\" : \"MCH\",\n\t\"departure\": \"27-01-2018 21:10:00\",\n\t\"arrival\": \"27-01-2018 22:10:00\"\n}"
+				},
+				"description": "Add a new route"
+			},
+			"response": []
+		},
+		{
+			"name": "Get routes",
+			"request": {
+				"url": "http://192.168.99.100:9100/routes-store-service/api/route",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Get routes"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete route",
+			"request": {
+				"url": "http://192.168.99.100:9100/routes-store-service/api/route",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Delete route from store service"
+			},
+			"response": []
+		},
+		{
+			"name": "Get optimized route",
+			"request": {
+				"url": {
+					"raw": "http://192.168.99.100:9100/routes-optimizer-service/api/route?origin=barbate",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"99",
+						"100"
+					],
+					"port": "9100",
+					"path": [
+						"routes-optimizer-service",
+						"api",
+						"route"
+					],
+					"query": [
+						{
+							"key": "origin",
+							"value": "barbate",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get optimized route for the origin"
+			},
+			"response": []
+		}
+	]
+}

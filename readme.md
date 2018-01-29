@@ -14,11 +14,14 @@ It listens on port 9100, it takes care of routing external requests towards "int
 * Circuit breakers using Netflix Hystrix.
 * It is a Eureka client, so services URL are known on the fly as provided by Eureka Server (assuming “internal services” are Eureka clients).
 
+It has been added some features on top of Base Zuul:
+* a couple of filters: PreFilterZuul and PostFilterZuul to add pre and post routing easy to read logs.
+
 ## Routes.Store.Service
 Microservice providing storage services for routes: retrieval, insertion and deletion. It listens on port 9305.
 It uses h2 and spring-data-jpa to implement the repository layer.
 It is a Eureka client.
-See Api definition (StoreRoutes.apib)
+* See Api definition (/AdidasChallenge/StoreRoutes.apib)
 
 ## Routes.Optimizer.Service
 Microservice providing optimized itineraries service: given an origin city calculates the shortest path in time and then shortest path in hops from the origin city to all stored destinations. It listens on port 9405.
@@ -27,7 +30,7 @@ It relies on Routes.Store.Service to get available routes, then uses Dijkstra al
 * Hops optimized: directed graph using the same weight on all the edges.
 
 It is a Eureka client.
-See Api definition (OptmizedItineraries.apib)
+* See Api description using Api Blueprint (/AdidasChallenge/OptmizedItineraries.apib)
 
 ## Libraries used by all projects
 
@@ -46,14 +49,14 @@ See Api definition (OptmizedItineraries.apib)
 ###org.springframework.cloud:spring-cloud-starter-eureka-server (1.3.5.RELEASE)
 * It converts spring boot application EurekaServer into a real EurekaServer. 
 * It is required to add some specific configuration on the application.yml.
-* See EurekaServer readme for more details.
+* See EurekaServer readme (/AdidasChallenge/EurekaServer/readme.md) for more details.
 
 ## Libraries used by Zuul
 
 ###org.springframework.cloud:spring-cloud-starter-zuul (1.3.5.RELEASE)
 * It converts spring boot application Zuul into a real Zuul edge-router. 
 * It is required to add specific configuration on application.yml: to match request patterns with services, ribbon and hyxtrix configuration ,etc . 
-* See Zuul readme for more details.
+* See Zuul readme (/AdidasChallenge/Zuul/readme.md) for more details.
 
 ###org.springframework.cloud:spring-cloud-starter-eureka (1.3.5.RELEASE)
 * It enables this application to act as an Eureka Client. It is required specific configuration on application.yml to be able to reach EurekaServer.
@@ -98,26 +101,122 @@ For the project, it is required to optimize by time and by hops:
 * By hops: It makes a weighted directed graph, using the same weight (1), this way Dijkstra solves the shortest path ( less number of hops required).
 
 ## Download code
-Clone project from Github
+* First, clone project from Github
 ```
-git clone https://github.com/mbolori/Zuul.git
+https://github.com/ManuelBaeta/AdidasChallenge.git
 ``` 
 
+Directory structure is quite straightforward:
+* On parent folder: parent pom file, docker-compose.yml and API Blueprint files (StoreRoutes.apib and OptmizedItineraries.apib) and 2 Postman collection exported as Store.Route.Service.postman_collection.json and Fill_Routes.postman_collection.json
+* On EurekaServer folder: pom file, Dockerfile and readme.md
+* On Zuul folder: pom file, Dockerfile and readme.md
+* On Routes.Store.Service folder: pom file, Dockerfile 
+* On Routes.Optimizer.Service folder: pom file, Dockerfile
+
 ## Build application
-In order to build the application
+* Second, navigate to <path-to>/AdidasChallenge and execute maven
 ```
+cd <path-to>/AdidasChallenge
 mvn clean package
 ``` 
 
+Expected Results: All ok, 4 jars were built.
+```
+[INFO] ------------------------------------------------------------------------  
+[INFO] Reactor Summary:  
+[INFO]  
+[INFO] ADIDAS_CHALLENGE ................................... SUCCESS [  0.155 s]   
+[INFO] EurekaServer ....................................... SUCCESS [  6.150 s]  
+[INFO] Zuul ............................................... SUCCESS [  1.429 s]  
+[INFO] Routes.Optimizer.Service ........................... SUCCESS [ 16.483 s]  
+[INFO] Routes.Store.Service ............................... SUCCESS [ 17.598 s]  
+[INFO] ------------------------------------------------------------------------  
+[INFO] BUILD SUCCESS  
+[INFO] ------------------------------------------------------------------------  
+[INFO] Total time: 42.602 s  
+[INFO] Finished at: 2018-01-29T19:42:50+01:00  
+[INFO] Final Memory: 60M/232M  
+[INFO] ------------------------------------------------------------------------  
+```
 
 ## Run on Dockers
-* REMARK: Dockerized microservices were deployed and tested on a Windows 7 OS, therefore on a “Docker Toolbox on Windows” instead of newer “Docker for Mac” and “Docker for Windows”.  I don’t foresee any issue because of this, but if any problem arises I would 
+REMARK:   
+Dockerized microservices were deployed and tested on Windows 7 OS, therefore on a “Docker Toolbox on Windows” instead of newer “Docker for Mac” or “Docker for Windows”.  I don’t foresee any issue because of this, but if any problem arises I will fix as soon as possible.
 
+* Third, navigate to <path-to>/AdidasChallenge and check docker-compose.yml is present:
+```
+$ ll   
+....  
+-rw-r--r-- 1 GZML7G 1049089  1355 Jan 28 17:33  docker-compose.yml  
+drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  EurekaServer/   
+drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Routes.Optimizer.Service/  
+drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Routes.Store.Service/  
+drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Zuul/  
+```
 
-### Docker command miscelanea
+* Fourth, use docker-compose to build the images and run the containers at once:
+```
+$ docker-compose up -d  
+....  
+Creating eureka-server ...  
+Creating eureka-server ... done  
+Creating edge-router ...  
+Creating edge-router ... done  
+Creating routes-store-service ...  
+Creating routes-store-service ... done  
+Creating routes-optimizer-service ...  
+Creating routes-optimizer-service ... done  
+```
+REMARK: 
+In case of problems with Docker image caching, try with docker-compose rm and docker-compose up -d again as suggested on 
+* [Stackoverflow](https://stackoverflow.com/questions/37454548/docker-compose-no-such-image/)
 
+* Fifth, check services are running
+```
+$ docker-compose ps  
+          Name                        Command               State                Ports  
+----------------------------------------------------------------------------------------------------  
+edge-router                /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:9100->9100/tcp  
+eureka-server              /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:8761->8761/tcp  
+routes-optimizer-service   /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:9405->9305/tcp, 9405/tcp   
+routes-store-service       /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:9305->9305/tcp   
+```
+
+* Sixth, check services have fully started (on my computer I have wait for a while ...)
+```
+$ docker-compose logs --follow 
+....
+```
+
+If we are reach, this point, all containers are running and ready to be tested.
 
 ## How to test
+REMARKS:  
+In order to execute test, it is required to know virtual box VM IP, it is usually 192.168.99.100
 
+```
+$ docker-machine ls  
+NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER        ERRORS  
+default   *        virtualbox   Running   tcp://192.168.99.100:2376           v17.10.0-ce   
+```
+
+EurekaServer will be reachable on http://192.168.99.100:8761 showing 3 connected applications: ROUTES-OPTIMIZER-SERVICE, ROURES-STORE-SERVICE and ZUUL-EDGE-ROUTER
+
+I have included 2 POSTMAN collections on AdidasChallenge folder:
+Fill_Routes.postman_collection.json: It calls seven times to http://192.168.99.100:9100/routes-store-service/api/route to define a simple scenario with 4 cities ZAR, MAD, GUA, BAR
+Store.Route.Service.postman_collection.json: It contains 4 calls:
+* Add route: http://192.168.99.100:9100/routes-store-service/api/route to test adding routes on Routes.Store.Service
+* Get routes: http://192.168.99.100:9100/routes-store-service/api/route to test routes retrieval on Routes.Store.Service
+* Delete route: http://192.168.99.100:9100/routes-store-service/api/route to test route deletion on Routes.Store.Service
+* Get optimized route: http://192.168.99.100:9100/routes-optimizer-service/api/route?origin=ZAR to test get optimized itineraries for a origin city.
+
+## Troubleshooting
+Applications are packaged during maven build with an internal application.yml.
+
+### Provide an external configuration file
+It could be used  --spring.config.location=<path-to-config>/application.yml to provide a external configuration file. This would require to modify Dockerfile file.
+
+### Problem connecting to EurekaService
+All Eureka clients rely on Docker simple DNS for name resolution (resolving eureka-server name) as their application.yml configuration is: eureka.client.serviceUrl.defaultZone:    http://eureka-server:8761/eureka
 
 

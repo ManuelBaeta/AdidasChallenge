@@ -4,40 +4,6 @@ It is a Spring boot application based on Spring Cloud Netflix Zuul to provide an
 It takes care of routing incoming request to the proper inner service instance, based on url request destination, BESIDES it provides load-balancing between inner services instances
 As it is itself a Eureka client, inner services URL are not predefined on application.yml, there are known on the fly as provided by Eureka Server (assuming inner services are Eureka clients). 
 
-## Getting Started
-
-Clone code: 
-```
-git clone https://github.com/mbolori/Zuul.git
-``` 
-
-### Prerequisites
-
-You need maven installed on local.
-In order to build the project: 
-```
-mvn clean install
-```
-
-### Running program
-
-In order to run jar:
-```
-java -jar Zuul-1.0.0-SNAPSHOT.jar start --spring.config.location=/<path-to-configuration/application.yml  
-```
-
-It is not required to provide external configuration if Zuul is configured to route request towards service spring-boot-palindrome on path /spring-boot-palindrome/api/**
-```
-zuul:
-    ignoredServices: '*'
-    routes:
-        spring-boot-palindrome:
-            path:       /spring-boot-palindrome/api/**
-            sensitiveHeaders: 
-            serviceId:  spring-boot-palindrome
-            stripPrefix: false
-```
-
 ## Configuration
 
 Most of the configuration is well known boilerplate configuration such spring.info, spring.profile, spring.application, actuator's endpoints configuration, server.port, etc.
@@ -62,14 +28,24 @@ hystrix.command.default.execution.timeout.enabled: false  /////Disable Hystrix t
 ### Zuul Configuration 
 It is an edge-router, so takes care of routing, based on matching request url against a set of predefined patterns. As this edge-router is an Eureka client, inner services are **KNOWN** based on services names instead of fixed url.
 ```
-zuul:
-    ignoredServices: '*'
-    routes:
-        spring-boot-palindrome:
-            path:       /spring-boot-palindrome/api/**
-            sensitiveHeaders: 
-            serviceId:  spring-boot-palindrome
-            stripPrefix: false
+zuul:  
+    ignoredServices: '*'  
+    routes:  
+        routes-store-service:  
+              path:       /routes-store-service/api/**  
+              sensitiveHeaders:   
+              serviceId:  routes-store-service  
+              stripPrefix: false  
+        spring-boot-palindrome:  
+              path:       /spring-boot-palindrome/api/**  
+              sensitiveHeaders:   
+              serviceId:  spring-boot-palindrome  
+              stripPrefix: false              
+        routes-optimizer-service:  
+              path:       /routes-optimizer-service/api/**  
+              sensitiveHeaders:   
+              serviceId:  routes-optimizer-service  
+              stripPrefix: false  
 
 ```
 
