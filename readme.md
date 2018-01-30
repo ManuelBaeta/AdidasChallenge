@@ -42,7 +42,7 @@ It is a Eureka client.
 
 ### org.springframework.boot:spring-boot-starter-actuator
 * Enable actuator endpoints, a set of production-ready endpoints that allows application monitoring such /health, /info, /metrics. 
-* On the application.yml can be tweaked those endpoints, ie: if they are enabled, id they are sensitive (providing less information to unauthenticated requests)..
+* On the application.yml can be tweaked those endpoints, ie: if they are enabled, or if they are sensitive (providing less information to unauthenticated requests)..
 
 ## Libraries used by EurekaServer
 
@@ -76,7 +76,7 @@ It is a Eureka client.
 * A exclusion is required because eureka uses jax-rs 1.x and on the project it is also used JAX-RS 2.x to implement REST handling.
 
 ### org.springframework.boot:spring-boot-starter-jersey
-* It is the JAX-RS 2.X Jersey implementation, used to implement REST features. Use of JAX-RS 2.X over Spring MVC is a matter of taste, I feel more comfortable using jersey.
+* It is the JAX-RS 2.X Jersey implementation, used to implement REST features. Use of JAX-RS 2.X over Spring MVC is a matter of preference, I feel more comfortable using jersey.
 
 ### org.springframework.boot:spring-boot-starter-test
 * It includes several dependencies such JUnit, Hamcrest and Mockito to perform unit testing.
@@ -141,20 +141,10 @@ Expected Results: All ok, 4 jars were built.
 
 ## Run on Dockers
 REMARK:   
-Dockerized microservices were deployed and tested on Windows 7 OS, therefore on a “Docker Toolbox on Windows” instead of newer “Docker for Mac” or “Docker for Windows”.  I don’t foresee any issue because of this, but if any problem arises I will fix as soon as possible.
+Dockerized microservices were deployed and tested on Windows 7 OS (“Docker Toolbox on Windows”) instead of newer “Docker for Mac” or “Docker for Windows”.  I don’t foresee any issue because of this, but when in the below chapters says "192.168.99.100" use localhost instead.
 
-* Third, navigate to <path-to>/AdidasChallenge and check docker-compose.yml is present:
-```
-$ ll   
-....  
--rw-r--r-- 1 GZML7G 1049089  1355 Jan 28 17:33  docker-compose.yml  
-drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  EurekaServer/   
-drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Routes.Optimizer.Service/  
-drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Routes.Store.Service/  
-drwxr-xr-x 1 GZML7G 1049089     0 Jan 29 19:42  Zuul/  
-```
 
-* Fourth, use docker-compose to build the images and run the containers at once:
+* Third, use docker-compose to build the images and run the containers in one go:
 ```
 $ docker-compose up -d  
 ....  
@@ -168,10 +158,9 @@ Creating routes-optimizer-service ...
 Creating routes-optimizer-service ... done  
 ```
 REMARK: 
-In case of problems with Docker image caching, try with docker-compose rm and docker-compose up -d again as suggested on 
-* [Stackoverflow](https://stackoverflow.com/questions/37454548/docker-compose-no-such-image/)
+In case of problems with Docker image caching, try with docker-compose rm and docker-compose up -d again as suggested on [Stackoverflow](https://stackoverflow.com/questions/37454548/docker-compose-no-such-image/)
 
-* Fifth, check services are running
+* Fourth, check that services are up and running
 ```
 $ docker-compose ps  
           Name                        Command               State                Ports  
@@ -182,17 +171,16 @@ routes-optimizer-service   /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:9405
 routes-store-service       /bin/sh -c /usr/bin/java - ...   Up      0.0.0.0:9305->9305/tcp   
 ```
 
-* Sixth, check services have fully started (on my computer I have wait for a while ...)
+* Fifth, check services are fully started
 ```
 $ docker-compose logs --follow 
 ....
 ```
 
-If we are reach, this point, all containers are running and ready to be tested.
-
 ## How to test
 REMARKS:  
-In order to execute test, it is required to know virtual box VM IP, it is usually 192.168.99.100
+* In order to execute test, it is required to know virtual box VM IP, it is usually 192.168.99.100
+* If you are not using Dockers ToolBox, disregard previous remark and use localhost instead.
 
 ```
 $ docker-machine ls  
@@ -200,15 +188,20 @@ NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DO
 default   *        virtualbox   Running   tcp://192.168.99.100:2376           v17.10.0-ce   
 ```
 
-EurekaServer will be reachable on http://192.168.99.100:8761 showing 3 connected applications: ROUTES-OPTIMIZER-SERVICE, ROURES-STORE-SERVICE and ZUUL-EDGE-ROUTER
+* If you are using Dockers ToolBox: EurekaServer will be reachable on http://192.168.99.100:8761 showing 3 connected applications: ROUTES-OPTIMIZER-SERVICE, ROURES-STORE-SERVICE and ZUUL-EDGE-ROUTER
+* For the rest of Dockers versions: EurekaServer will be reachable on http://localhost:8761 
 
 I have included 2 POSTMAN collections on AdidasChallenge folder:
-Fill_Routes.postman_collection.json: It calls seven times to http://192.168.99.100:9100/routes-store-service/api/route to define a simple scenario with 4 cities ZAR, MAD, GUA, BAR
+Fill_Routes.postman_collection.json: It calls seven times to http://192.168.99.100:9100/routes-store-service/api/route to define a simple scenario with 4 cities ZAR, MAD, GUA, BAR  
+
 Store.Route.Service.postman_collection.json: It contains 4 calls:
 * Add route: http://192.168.99.100:9100/routes-store-service/api/route to test adding routes on Routes.Store.Service
 * Get routes: http://192.168.99.100:9100/routes-store-service/api/route to test routes retrieval on Routes.Store.Service
 * Delete route: http://192.168.99.100:9100/routes-store-service/api/route to test route deletion on Routes.Store.Service
 * Get optimized route: http://192.168.99.100:9100/routes-optimizer-service/api/route?origin=ZAR to test get optimized itineraries for a origin city.
+
+REMARK:
+Modify POST collections to use use localhost instead if not using Docker ToolBox.
 
 ## Troubleshooting
 Applications are packaged during maven build with an internal application.yml.
@@ -218,5 +211,3 @@ It could be used  --spring.config.location=<path-to-config>/application.yml to p
 
 ### Problem connecting to EurekaService
 All Eureka clients rely on Docker simple DNS for name resolution (resolving eureka-server name) as their application.yml configuration is: eureka.client.serviceUrl.defaultZone:    http://eureka-server:8761/eureka
-
-
